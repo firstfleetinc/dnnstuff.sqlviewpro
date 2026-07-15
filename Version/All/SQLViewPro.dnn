@@ -120,6 +120,30 @@
               <name>Microsoft.ReportViewer.WebForms.dll</name>
               <sourceFileName>Microsoft.ReportViewer.WebForms.dll</sourceFileName>
             </assembly>
+            <assembly>
+              <name>Google.Apis.dll</name>
+              <sourceFileName>Google.Apis.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Auth.dll</name>
+              <sourceFileName>Google.Apis.Auth.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Core.dll</name>
+              <sourceFileName>Google.Apis.Core.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Drive.v3.dll</name>
+              <sourceFileName>Google.Apis.Drive.v3.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Sheets.v4.dll</name>
+              <sourceFileName>Google.Apis.Sheets.v4.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Newtonsoft.Json.dll</name>
+              <sourceFileName>Newtonsoft.Json.dll</sourceFileName>
+            </assembly>
           </assemblies>
         </component>
         <component type="ResourceFile">
