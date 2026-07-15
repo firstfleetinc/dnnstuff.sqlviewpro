@@ -136,24 +136,6 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 		///To modify move field declaration from designer file to code-behind file.
 		///</remarks>
 		protected System.Web.UI.WebControls.DropDownList ddDispositionType;
-		
-		///<summary>
-		///lblSecretNameOverride control.
-		///</summary>
-		///<remarks>
-		///Auto-generated field.
-		///To modify move field declaration from designer file to code-behind file.
-		///</remarks>
-		protected LabelControl lblSecretNameOverride;
-		
-		///<summary>
-		///txtSecretNameOverride control.
-		///</summary>
-		///<remarks>
-		///Auto-generated field.
-		///To modify move field declaration from designer file to code-behind file.
-		///</remarks>
-		protected System.Web.UI.WebControls.TextBox txtSecretNameOverride;
 	}
 }
 

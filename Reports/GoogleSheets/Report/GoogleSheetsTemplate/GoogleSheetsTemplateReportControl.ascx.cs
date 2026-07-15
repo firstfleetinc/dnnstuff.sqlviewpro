@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Web.UI;
 using DotNetNuke.Common;
-using DNNStuff.SQLViewPro.Services;
 using DNNStuff.SQLViewPro.Services.GoogleSheets;
 
 namespace DNNStuff.SQLViewPro.GoogleSheetsReports
@@ -145,11 +144,6 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 
 		private GoogleSheetsClient CreateClient()
 		{
-			if (!string.IsNullOrEmpty(ReportExtra.SecretNameOverride))
-			{
-				return new GoogleSheetsClient(new DelineaClient(), ReportExtra.SecretNameOverride, "json-key");
-			}
-
 			return new GoogleSheetsClient();
 		}
 

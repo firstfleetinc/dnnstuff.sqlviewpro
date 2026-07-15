@@ -21,9 +21,6 @@ browser, and then deletes the temporary clone.
 -   Output Filename Prefix – the prefix used to name the exported `.xlsx` file.
     `[TICKS]` is replaced with the current tick count to keep file names unique.
 -   Disposition Type – `inline` or `attachment`, same as the Excel Template report
--   Secret Name Override – optional; overrides the default Delinea Secret Server
-    secret name used to retrieve the Google service-account key for this specific
-    report. Leave blank to use the site-wide default.
 
 ### Prerequisites
 
@@ -37,8 +34,8 @@ browser, and then deletes the temporary clone.
     -   `DNNStuff:SQLViewPro:DelineaBaseUrl`
     -   `DNNStuff:SQLViewPro:DelineaUsername`
     -   `DNNStuff:SQLViewPro:DelineaPassword`
-    -   `DNNStuff:SQLViewPro:DelineaGoogleSecretName` - the default secret name
-        used when a report doesn't specify a Secret Name Override
+    -   `DNNStuff:SQLViewPro:DelineaGoogleSecretName` - the secret name used to
+        retrieve the Google service-account key
 
 ### Notes
 

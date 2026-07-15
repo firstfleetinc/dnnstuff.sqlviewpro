@@ -31,10 +31,6 @@
                     <asp:ListItem Value="attachment">attachment</asp:ListItem>
                 </asp:DropDownList>
             </div>
-            <div class="dnnFormItem">
-	            <dnn:Label ID="lblSecretNameOverride" runat="server" ControlName="txtSecretNameOverride"  Suffix=":" />
-                <asp:TextBox ID="txtSecretNameOverride" Runat="server" columns="100 " />
-            </div>
         </fieldset>
     </div>
 </div>

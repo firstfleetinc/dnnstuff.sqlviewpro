@@ -38,7 +38,6 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 			obj.ContainsHeaderRow = chkContainsHeaderRow.Checked;
 			obj.OutputFileName = txtOutputFileName.Text;
 			obj.DispositionType = ddDispositionType.SelectedValue;
-			obj.SecretNameOverride = txtSecretNameOverride.Text;
 
 			return Serialization.SerializeObject(obj, typeof(GoogleSheetsTemplateReportSettings));
 
@@ -56,7 +55,6 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 			txtDataSheetName.Text = obj.DataSheetName;
 			chkContainsHeaderRow.Checked = obj.ContainsHeaderRow;
 			txtOutputFileName.Text = obj.OutputFileName;
-			txtSecretNameOverride.Text = obj.SecretNameOverride;
 
 			ControlHelpers.InitDropDownByValue(ddDispositionType, obj.DispositionType);
 		}
@@ -82,11 +80,6 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 		public string OutputFileName {get; set;}
 		public bool ContainsHeaderRow {get; set;}
 	    public string DispositionType { get; set; } = "attachment";
-		/// <summary>
-		/// Optional override for the Delinea secret name that holds the Google service-account
-		/// JSON key. When blank, DNNStuff:SQLViewPro:DelineaGoogleSecretName is used.
-		/// </summary>
-		public string SecretNameOverride { get; set; } = "";
 	}
 #endregion
 

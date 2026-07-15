@@ -85,7 +85,6 @@ Secret Server:
 </appSettings>
 ```
 
-`DelineaGoogleSecretName` is the default secret used by all Google Sheets Template
-reports; an individual report can override it via its **Secret Name Override**
-setting.
+`DelineaGoogleSecretName` is the secret used by all Google Sheets Template
+reports.
 

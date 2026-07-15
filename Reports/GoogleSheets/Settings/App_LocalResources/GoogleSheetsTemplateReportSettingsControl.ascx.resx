@@ -153,10 +153,4 @@
   <data name="lblDispositionType.Text" xml:space="preserve">
     <value>Disposition Type</value>
   </data>
-  <data name="lblSecretNameOverride.Help" xml:space="preserve">
-    <value>Optional: overrides the default Delinea secret name used to retrieve the Google service-account key for this report</value>
-  </data>
-  <data name="lblSecretNameOverride.Text" xml:space="preserve">
-    <value>Secret Name Override</value>
-  </data>
 </root>
