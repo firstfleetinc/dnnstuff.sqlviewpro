@@ -91,7 +91,7 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 			var templateFileId = client.FindTemplateByName(ReportExtra.DriveFolderId, ReportExtra.TemplateName);
 
 			var outputFileName = ReportExtra.OutputFileName.Replace("[TICKS]", DateTime.Now.Ticks.ToString());
-			var spreadsheetId = client.CloneSpreadsheet(templateFileId, outputFileName);
+			var spreadsheetId = client.CloneSpreadsheet(templateFileId, outputFileName, ReportExtra.DriveFolderId);
 
 			try
 			{

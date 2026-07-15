@@ -132,6 +132,11 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 				request.Q = string.Format("'{0}' in parents and name = '{1}' and trashed = false", folderId, templateName.Replace("'", "\\'"));
 				request.Fields = "files(id, name)";
 				request.PageSize = 1;
+				// The template folder lives on a shared drive - all
+				// three of these are required together for Drive to search shared-drive content.
+				request.SupportsAllDrives = true;
+				request.IncludeItemsFromAllDrives = true;
+				request.Corpora = "allDrives";
 
 				var result = request.Execute();
 				var file = result.Files != null ? result.Files.FirstOrDefault() : null;
@@ -150,15 +155,23 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 
 		/// <summary>
 		/// Clones the template spreadsheet so the original is never modified, and returns the
-		/// id of the new spreadsheet.
+		/// id of the new spreadsheet. The clone is explicitly placed in <paramref name="parentFolderId"/> 
+		/// so the caller always knows - and controls - where the temporary clone lives.
 		/// </summary>
-		public string CloneSpreadsheet(string templateFileId, string newFileName)
+		public string CloneSpreadsheet(string templateFileId, string newFileName, string parentFolderId)
 		{
 			try
 			{
 				var copyMetadata = new Google.Apis.Drive.v3.Data.File { Name = newFileName };
+				if (!string.IsNullOrEmpty(parentFolderId))
+				{
+					copyMetadata.Parents = new List<string> { parentFolderId };
+				}
+
 				var request = Drive.Files.Copy(copyMetadata, templateFileId);
 				request.Fields = "id";
+				// Required so the copy succeeds when the template lives on a shared drive.
+				request.SupportsAllDrives = true;
 				var result = request.Execute();
 				return result.Id;
 			}
@@ -230,7 +243,9 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 		{
 			try
 			{
-				Drive.Files.Delete(spreadsheetId).Execute();
+				var request = Drive.Files.Delete(spreadsheetId);
+				request.SupportsAllDrives = true;
+				request.Execute();
 			}
 			catch (Google.GoogleApiException ex)
 			{
