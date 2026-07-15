@@ -64,3 +64,28 @@ particular report set. For instance, you can create a parameter that
 displays a drop down list of countries.
 
 See [Parameters](parameters)
+
+Web.config Application Settings
+--------------------------------
+
+Some features read configuration from the host site's `web.config` `<appSettings>`
+section rather than from the SQLView Pro UI, since they involve credentials or
+environment-specific values that shouldn't be stored in the module's own settings.
+
+The [Google Sheets Template](googlesheetstemplate) report type requires the
+following keys, used to retrieve the Google service-account key from Delinea
+Secret Server:
+
+```xml
+<appSettings>
+  <add key="DNNStuff:SQLViewPro:DelineaBaseUrl" value="https://your-secret-server/SecretServer" />
+  <add key="DNNStuff:SQLViewPro:DelineaUsername" value="your-service-account-username" />
+  <add key="DNNStuff:SQLViewPro:DelineaPassword" value="your-service-account-password" />
+  <add key="DNNStuff:SQLViewPro:DelineaGoogleSecretName" value="default-secret-name" />
+</appSettings>
+```
+
+`DelineaGoogleSecretName` is the default secret used by all Google Sheets Template
+reports; an individual report can override it via its **Secret Name Override**
+setting.
+

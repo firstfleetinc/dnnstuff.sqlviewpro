@@ -29,6 +29,7 @@ Report Types
 * [Grid](grid)
 * [Template](template)
 * [Excel Template](exceltemplate)
+* [Google Sheets Template](googlesheetstemplate)
 * [SQL Server Reporting Services (SSRS)](ssrs)
 
 Parameter Types

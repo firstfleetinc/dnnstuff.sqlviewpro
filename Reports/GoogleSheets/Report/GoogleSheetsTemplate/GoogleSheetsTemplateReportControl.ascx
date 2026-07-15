@@ -1,0 +1,1 @@
+<%@ Control Language="C#" Inherits="DNNStuff.SQLViewPro.GoogleSheetsReports.GoogleSheetsTemplateReportControl" CodeBehind="GoogleSheetsTemplateReportControl.ascx.cs" AutoEventWireup="true" Explicit="True" targetSchema="http://schemas.microsoft.com/intellisense/ie5" %>

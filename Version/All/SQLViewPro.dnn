@@ -105,6 +105,10 @@
               <sourceFileName>DNNStuff.SQLViewPro.SqlDataProvider.dll</sourceFileName>
             </assembly>
             <assembly>
+              <name>DNNStuff.SQLViewPro.GoogleSheetsReports.dll</name>
+              <sourceFileName>DNNStuff.SQLViewPro.GoogleSheetsReports.dll</sourceFileName>
+            </assembly>
+            <assembly>
               <name>DNNStuff.Utilities.dll</name>
               <sourceFileName>DNNStuff.Utilities.dll</sourceFileName>
             </assembly>
@@ -232,6 +236,10 @@
             <script type="Install">
               <name>04.00.18.SqlDataProvider</name>
               <version>04.00.18</version>
+            </script>
+            <script type="Install">
+              <name>04.03.00.SqlDataProvider</name>
+              <version>04.03.00</version>
             </script>
             <script type="UnInstall">
               <name>Uninstall.SqlDataProvider</name>
