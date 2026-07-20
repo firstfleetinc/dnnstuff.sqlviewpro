@@ -236,20 +236,65 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 		}
 
 		/// <summary>
-		/// Best-effort cleanup of the temporary cloned spreadsheet. Callers should invoke this
-		/// from a finally block and treat failures as non-fatal (log a warning, don't fail the report).
+		/// Lists every (non-trashed) folder anywhere within the given shared drive - not just
+		/// the folders directly under the drive's root - sorted by name. Used to populate the
+		/// "Drive Folder" picker in the report settings UI, so users select a folder by name
+		/// instead of pasting a raw folder id.
+		/// </summary>
+		public IList<Google.Apis.Drive.v3.Data.File> ListFoldersInSharedDrive(string sharedDriveId)
+		{
+			try
+			{
+				var folders = new List<Google.Apis.Drive.v3.Data.File>();
+				string pageToken = null;
+
+				do
+				{
+					var request = Drive.Files.List();
+					request.Q = "mimeType = 'application/vnd.google-apps.folder' and trashed = false";
+					request.Fields = "nextPageToken, files(id, name)";
+					request.DriveId = sharedDriveId;
+					request.Corpora = "drive";
+					// Required together for Drive to enumerate shared-drive content.
+					request.SupportsAllDrives = true;
+					request.IncludeItemsFromAllDrives = true;
+					request.PageToken = pageToken;
+					request.PageSize = 1000;
+
+					var result = request.Execute();
+					if (result.Files != null)
+					{
+						folders.AddRange(result.Files);
+					}
+
+					pageToken = result.NextPageToken;
+				} while (!string.IsNullOrEmpty(pageToken));
+
+				return folders.OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase).ToList();
+			}
+			catch (Google.GoogleApiException ex)
+			{
+				throw GoogleSheetsClientException.FromGoogleApiException(GoogleSheetsErrorType.FolderList, string.Format("Error listing folders in shared drive '{0}'.", sharedDriveId), ex);
+			}
+		}
+
+		/// <summary>
+		/// Best-effort cleanup of the temporary cloned spreadsheet. Moves the file to Trash
+		/// instead of permanently deleting it, since the shared drive's permission settings
+		/// do not allow a hard delete. Callers should invoke this from a finally block and
+		/// treat failures as non-fatal (log a warning, don't fail the report).
 		/// </summary>
 		public void DeleteSpreadsheet(string spreadsheetId)
 		{
 			try
 			{
-				var request = Drive.Files.Delete(spreadsheetId);
+				var request = Drive.Files.Update(new Google.Apis.Drive.v3.Data.File { Trashed = true }, spreadsheetId);
 				request.SupportsAllDrives = true;
 				request.Execute();
 			}
 			catch (Google.GoogleApiException ex)
 			{
-				throw GoogleSheetsClientException.FromGoogleApiException(GoogleSheetsErrorType.Delete, string.Format("Error deleting temporary spreadsheet '{0}'.", spreadsheetId), ex);
+				throw GoogleSheetsClientException.FromGoogleApiException(GoogleSheetsErrorType.Delete, string.Format("Error trashing temporary spreadsheet '{0}'.", spreadsheetId), ex);
 			}
 		}
 	}

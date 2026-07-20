@@ -45,7 +45,16 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 		///Auto-generated field.
 		///To modify move field declaration from designer file to code-behind file.
 		///</remarks>
-		protected System.Web.UI.WebControls.TextBox txtDriveFolderId;
+		protected System.Web.UI.WebControls.DropDownList ddDriveFolderId;
+
+		///<summary>
+		///litDriveFolderError control.
+		///</summary>
+		///<remarks>
+		///Auto-generated field.
+		///To modify move field declaration from designer file to code-behind file.
+		///</remarks>
+		protected System.Web.UI.WebControls.Literal litDriveFolderError;
 		
 		///<summary>
 		///lblTemplateName control.

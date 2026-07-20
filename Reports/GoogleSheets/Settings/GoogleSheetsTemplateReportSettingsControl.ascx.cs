@@ -1,5 +1,8 @@
+using System;
+using System.Configuration;
 using System.Xml.Serialization;
 using DNNStuff.SQLViewPro.Controls;
+using DNNStuff.SQLViewPro.Services.GoogleSheets;
 
 namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 {
@@ -32,7 +35,7 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 		{
 
 			var obj = new GoogleSheetsTemplateReportSettings();
-			obj.DriveFolderId = txtDriveFolderId.Text;
+			obj.DriveFolderId = ddDriveFolderId.SelectedValue;
 			obj.TemplateName = txtTemplateName.Text;
 			obj.DataSheetName = txtDataSheetName.Text;
 			obj.ContainsHeaderRow = chkContainsHeaderRow.Checked;
@@ -45,18 +48,58 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 
 		public override void LoadSettings(string settings)
 		{
+			// LoadSettings is invoked directly by EditReport.ascx.cs right after LoadControl(),
+			// before this control is added to the page's control tree - so this is the only
+			// reliable place (on both the initial load and every postback) to populate the
+			// folder dropdown before selecting the persisted value.
+			PopulateDriveFolderDropdown();
+
 			var obj = new GoogleSheetsTemplateReportSettings();
 			if (!string.IsNullOrEmpty(settings))
 			{
 				obj = (GoogleSheetsTemplateReportSettings) (Serialization.DeserializeObject(settings, typeof(GoogleSheetsTemplateReportSettings)));
 			}
-			txtDriveFolderId.Text = obj.DriveFolderId;
+			ControlHelpers.InitDropDownByValue(ddDriveFolderId, obj.DriveFolderId);
 			txtTemplateName.Text = obj.TemplateName;
 			txtDataSheetName.Text = obj.DataSheetName;
 			chkContainsHeaderRow.Checked = obj.ContainsHeaderRow;
 			txtOutputFileName.Text = obj.OutputFileName;
 
 			ControlHelpers.InitDropDownByValue(ddDispositionType, obj.DispositionType);
+		}
+
+#endregion
+
+#region  Drive Folder Dropdown
+
+		private void PopulateDriveFolderDropdown()
+		{
+			try
+			{
+				var sharedDriveId = ConfigurationManager.AppSettings["DNNStuff:SQLViewPro:GoogleSheetsSharedDriveId"];
+				if (string.IsNullOrEmpty(sharedDriveId))
+				{
+					throw new InvalidOperationException("DNNStuff:SQLViewPro:GoogleSheetsSharedDriveId is not configured in web.config appSettings.");
+				}
+
+				var client = new GoogleSheetsClient();
+				client.Authenticate();
+				var folders = client.ListFoldersInSharedDrive(sharedDriveId);
+
+				ddDriveFolderId.DataSource = folders;
+				ddDriveFolderId.DataBind();
+
+				litDriveFolderError.Visible = false;
+				litDriveFolderError.Text = string.Empty;
+			}
+			catch (Exception ex)
+			{
+				DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
+
+				ddDriveFolderId.Items.Clear();
+				litDriveFolderError.Text = "<span class=\"dnnFormMessage dnnFormValidationSummary\">Unable to load Drive folders. Check the Google Sheets configuration.</span>";
+				litDriveFolderError.Visible = true;
+			}
 		}
 
 #endregion

@@ -10,6 +10,7 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 		Write,
 		Export,
 		Delete,
+		FolderList,
 		RateLimit,
 		Unknown
 	}

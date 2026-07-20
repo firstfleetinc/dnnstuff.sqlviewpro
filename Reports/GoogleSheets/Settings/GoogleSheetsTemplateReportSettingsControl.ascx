@@ -5,8 +5,9 @@
 	<div class="dnnClear">
 	    <fieldset>
 		    <div class="dnnFormItem">
-	            <dnn:Label ID="lblDriveFolderId" runat="server" ControlName="txtDriveFolderId"  Suffix=":" />
-                <asp:TextBox ID="txtDriveFolderId" Runat="server" columns="100 " />
+		        <dnn:Label ID="lblDriveFolderId" runat="server" ControlName="ddDriveFolderId"  Suffix=":" />
+                <asp:DropDownList ID="ddDriveFolderId" runat="server" DataTextField="Name" DataValueField="Id" />
+                <asp:Literal ID="litDriveFolderError" runat="server" Visible="false" />
             </div>
             <div class="dnnFormItem">
 	            <dnn:Label ID="lblTemplateName" runat="server" ControlName="txtTemplateName"  Suffix=":" />

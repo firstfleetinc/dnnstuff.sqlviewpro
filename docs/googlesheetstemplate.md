@@ -9,8 +9,10 @@ browser, and then deletes the temporary clone.
 
 ### Google Sheets Template Report Fields
 
--   Drive Folder ID – the Google Drive folder id that contains the template
-    spreadsheet (this is the long id segment in the folder's URL)
+-   Drive Folder – a dropdown listing every folder (by name) within the
+    configured shared Drive; pick the folder that contains the template
+    spreadsheet. The dropdown's value is the folder's Drive id, but you no
+    longer need to look up or paste that id yourself.
 -   Template Name – the template spreadsheet's file name within that Drive folder
 -   Data Sheet Name – the sheet (tab) within the template where report data is
     written
@@ -36,6 +38,8 @@ browser, and then deletes the temporary clone.
     -   `DNNStuff:SQLViewPro:DelineaPassword`
     -   `DNNStuff:SQLViewPro:DelineaGoogleSecretName` - the secret name used to
         retrieve the Google service-account key
+    -   `DNNStuff:SQLViewPro:GoogleSheetsSharedDriveId` - the shared Drive id
+        whose folders are listed in the "Drive Folder" dropdown
 
 ### Notes
 
