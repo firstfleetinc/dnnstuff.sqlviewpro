@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lblDriveFolderId.Help" xml:space="preserve">
-    <value>The Google Drive folder id that contains the template spreadsheet (found in the folder's URL)</value>
+    <value>The Drive folder (within the configured shared drive) that contains the template spreadsheet</value>
   </data>
   <data name="lblDriveFolderId.Text" xml:space="preserve">
-    <value>Drive Folder ID</value>
+    <value>Template Folder</value>
   </data>
   <data name="lblTemplateName.Help" xml:space="preserve">
     <value>The template spreadsheet's file name within the Drive folder</value>

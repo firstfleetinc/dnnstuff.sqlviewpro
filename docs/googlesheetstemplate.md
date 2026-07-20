@@ -9,7 +9,7 @@ browser, and then deletes the temporary clone.
 
 ### Google Sheets Template Report Fields
 
--   Drive Folder – a dropdown listing every folder (by name) within the
+-   Template Folder – a dropdown listing every folder (by name) within the
     configured shared Drive; pick the folder that contains the template
     spreadsheet. The dropdown's value is the folder's Drive id, but you no
     longer need to look up or paste that id yourself.
@@ -39,7 +39,7 @@ browser, and then deletes the temporary clone.
     -   `DNNStuff:SQLViewPro:DelineaGoogleSecretName` - the secret name used to
         retrieve the Google service-account key
     -   `DNNStuff:SQLViewPro:GoogleSheetsSharedDriveId` - the shared Drive id
-        whose folders are listed in the "Drive Folder" dropdown
+        whose folders are listed in the "Template Folder" dropdown
 
 ### Notes
 

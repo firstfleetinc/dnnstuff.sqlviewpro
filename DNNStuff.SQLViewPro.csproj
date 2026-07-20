@@ -429,6 +429,8 @@
     <Content Include="Version\Data\04.00.13.SqlDataProvider" />
     <Content Include="Version\Data\04.02.00.SqlDataProvider" />
     <Content Include="Version\Data\04.00.18.SqlDataProvider" />
+    <Content Include="Version\Data\04.03.00.SqlDataProvider" />
+    <Content Include="Version\Data\04.03.01.SqlDataProvider" />
     <None Include="Version\Data\Uninstall.SqlDataProvider" />
     <Content Include="docs\configuration.md" />
     <Content Include="docs\connections.md" />
