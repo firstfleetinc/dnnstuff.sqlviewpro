@@ -1,0 +1,4 @@
+-- No database schema changes for 04.03.01.
+-- This release moves Google Sheets Template temporary spreadsheets to Trash
+-- instead of permanently deleting them, and replaces the free-text Drive
+-- Folder Id field with a dropdown populated from the configured shared drive.

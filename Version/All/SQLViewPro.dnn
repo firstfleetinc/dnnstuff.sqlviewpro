@@ -105,6 +105,10 @@
               <sourceFileName>DNNStuff.SQLViewPro.SqlDataProvider.dll</sourceFileName>
             </assembly>
             <assembly>
+              <name>DNNStuff.SQLViewPro.GoogleSheetsReports.dll</name>
+              <sourceFileName>DNNStuff.SQLViewPro.GoogleSheetsReports.dll</sourceFileName>
+            </assembly>
+            <assembly>
               <name>DNNStuff.Utilities.dll</name>
               <sourceFileName>DNNStuff.Utilities.dll</sourceFileName>
             </assembly>
@@ -115,6 +119,30 @@
             <assembly>
               <name>Microsoft.ReportViewer.WebForms.dll</name>
               <sourceFileName>Microsoft.ReportViewer.WebForms.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.dll</name>
+              <sourceFileName>Google.Apis.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Auth.dll</name>
+              <sourceFileName>Google.Apis.Auth.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Core.dll</name>
+              <sourceFileName>Google.Apis.Core.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Drive.v3.dll</name>
+              <sourceFileName>Google.Apis.Drive.v3.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Google.Apis.Sheets.v4.dll</name>
+              <sourceFileName>Google.Apis.Sheets.v4.dll</sourceFileName>
+            </assembly>
+            <assembly>
+              <name>Newtonsoft.Json.dll</name>
+              <sourceFileName>Newtonsoft.Json.dll</sourceFileName>
             </assembly>
           </assemblies>
         </component>
@@ -232,6 +260,14 @@
             <script type="Install">
               <name>04.00.18.SqlDataProvider</name>
               <version>04.00.18</version>
+            </script>
+            <script type="Install">
+              <name>04.03.00.SqlDataProvider</name>
+              <version>04.03.00</version>
+            </script>
+            <script type="Install">
+              <name>04.03.01.SqlDataProvider</name>
+              <version>04.03.01</version>
             </script>
             <script type="UnInstall">
               <name>Uninstall.SqlDataProvider</name>

@@ -1,0 +1,8 @@
+INSERT INTO {databaseOwner}[{objectQualifier}DNNStuff_SqlViewPro_ReportType] (
+	[ReportTypeId],
+	[ReportTypeName],
+	[ReportTypeControlSrc],
+	[ReportTypeSettingsControlSrc]
+)
+	SELECT 'GOOGLESHEETSTEMPLATE', 'Google Sheets Template', 'Reports/GoogleSheets/Report/GoogleSheetsTemplate/GoogleSheetsTemplateReportControl.ascx', 'Reports/GoogleSheets/Settings/GoogleSheetsTemplateReportSettingsControl.ascx'
+GO

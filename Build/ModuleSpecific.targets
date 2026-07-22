@@ -11,6 +11,7 @@
     <ProjectToBuild Include="..\Reports\SSRS\$(Company).$(ProductName).SSRSReports.csproj" />
     <ProjectToBuild Include="..\Parameters\Standard\$(Company).$(ProductName).StandardParameters.csproj" />
     <ProjectToBuild Include="..\Parameters\Mobile\$(Company).$(ProductName).MobileParameters.csproj" />
+    <ProjectToBuild Include="..\Reports\GoogleSheets\$(Company).$(ProductName).GoogleSheetsReports.csproj" />
   </ItemGroup>
   <ItemGroup>
     <MyResourceFiles Include="..\*.ascx" />
@@ -40,6 +41,10 @@
     <MyResourceFiles Include="..\Parameters\Mobile\**\Resources\*.*" />
     <MyResourceFiles Include="..\Parameters\Mobile\Settings\App_LocalResources\**\*.resx" />
 
+    <MyResourceFiles Include="..\Reports\GoogleSheets\**\*.ascx" />
+    <MyResourceFiles Include="..\Reports\GoogleSheets\**\*.resx" />
+    <MyResourceFiles Include="..\Reports\GoogleSheets\Settings\**\*.xml" />
+
     <MyResourceFiles Include="..\Skins\**\*.*" />
     <MyResourceFiles Include="..\Repository\**\*.xml" />
     <MyResourceFiles Include="..\Resources\**\*.*" />
@@ -50,6 +55,12 @@
     <MyContentFiles Include="..\refs\*.*" />
     <MyContentFiles Include="..\LICENSE" />    
     <MyContentFiles Include="..\packages\Microsoft.ReportViewer.Runtime.WebForms.11.0.3452.0\lib\Microsoft.ReportViewer.WebForms.dll" />
+    <MyContentFiles Include="..\packages\Google.Apis.1.41.1\lib\net45\Google.Apis.dll" />
+    <MyContentFiles Include="..\packages\Google.Apis.Auth.1.41.1\lib\net45\Google.Apis.Auth.dll" />
+    <MyContentFiles Include="..\packages\Google.Apis.Core.1.41.1\lib\net45\Google.Apis.Core.dll" />
+    <MyContentFiles Include="..\packages\Google.Apis.Drive.v3.1.41.1.1750\lib\net45\Google.Apis.Drive.v3.dll" />
+    <MyContentFiles Include="..\packages\Google.Apis.Sheets.v4.1.41.1.1754\lib\net45\Google.Apis.Sheets.v4.dll" />
+    <MyContentFiles Include="..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll" />
   </ItemGroup>
   <Import Project="DNNInstall.targets" />
 </Project>

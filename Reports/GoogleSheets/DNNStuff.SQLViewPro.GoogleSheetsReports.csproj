@@ -4,7 +4,7 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2E8E89C2-A59F-4DE8-B49D-437556E8F6AF}</ProjectGuid>
+    <ProjectGuid>{5A4B1C1A-B0B5-4621-ADA2-7BCB04605596}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +13,7 @@
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>DNNStuff.SQLViewPro.MobileParameters</AssemblyName>
+    <AssemblyName>DNNStuff.SQLViewPro.GoogleSheetsReports</AssemblyName>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
@@ -35,7 +35,22 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <PublishUrl>http://localhost/DNNStuff.SQLViewPro.GoogleSheetsReports/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
     <UseIISExpress>false</UseIISExpress>
     <TargetFrameworkProfile />
     <IISExpressSSLPort />
@@ -47,12 +62,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>DNNStuff.SQLViewPro.MobileParameters.xml</DocumentationFile>
+    <DocumentationFile>DNNStuff.SQLViewPro.GoogleSheetsReports.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>DEBUG</DefineConstants>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <DebugSymbols>true</DebugSymbols>
@@ -63,11 +77,10 @@
     <WarningLevel>1</WarningLevel>
     <NOWARN>1591,660,661</NOWARN>
     <DebugType>full</DebugType>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>DNNStuff.SQLViewPro.MobileParameters.xml</DocumentationFile>
+    <DocumentationFile>DNNStuff.SQLViewPro.GoogleSheetsReports.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -83,7 +96,6 @@
     <WarningLevel>1</WarningLevel>
     <NOWARN>1591,660,661</NOWARN>
     <DebugType>none</DebugType>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetNuke, Version=7.2.0.613, Culture=neutral, processorArchitecture=MSIL">
@@ -92,11 +104,15 @@
     <Reference Include="Microsoft.ApplicationBlocks.Data, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.ApplicationBlocks.Data.2.0.0\lib\net40\Microsoft.ApplicationBlocks.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Google.Apis.Drive.v3">
+      <HintPath>..\..\packages\Google.Apis.Drive.v3.1.41.1.1750\lib\net45\Google.Apis.Drive.v3.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="mscorlib" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -117,34 +133,56 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Settings\MobiscrollParameterSettingsControl.ascx.designer.cs">
-      <DependentUpon>MobiscrollParameterSettingsControl.ascx</DependentUpon>
+    <Compile Include="Report\GoogleSheetsTemplate\GoogleSheetsTemplateReportControl.ascx.designer.cs">
+      <DependentUpon>GoogleSheetsTemplateReportControl.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Settings\MobiscrollParameterSettingsControl.ascx.cs">
-      <DependentUpon>MobiscrollParameterSettingsControl.ascx</DependentUpon>
+    <Compile Include="Report\GoogleSheetsTemplate\GoogleSheetsTemplateReportControl.ascx.cs">
+      <DependentUpon>GoogleSheetsTemplateReportControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Parameter\Mobiscroll\MobiscrollParameterControl.ascx.designer.cs">
-      <DependentUpon>MobiscrollParameterControl.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Parameter\Mobiscroll\MobiscrollParameterControl.ascx.cs">
-      <DependentUpon>MobiscrollParameterControl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Content Include="Parameter\Mobiscroll\Resources\jquery.mobile-1.1.0-rc.1.min.css" />
-    <Content Include="Parameter\Mobiscroll\Resources\jquery.mobile-1.1.0-rc.1.min.js" />
-    <Content Include="Parameter\Mobiscroll\Resources\mobiscroll-1.6.min.css" />
-    <Content Include="Parameter\Mobiscroll\Resources\mobiscroll-1.6.min.js" />
-    <Content Include="Settings\MobiscrollParameterSettingsControl.ascx" />
-    <Content Include="Parameter\Mobiscroll\MobiscrollParameterControl.ascx" />
-    <Content Include="Settings\App_LocalResources\MobiscrollParameterSettingsControl.ascx.resx" />
-    <EmbeddedResource Include="Settings\MobiscrollParameterSettingsControl.ascx.resx">
-      <DependentUpon>MobiscrollParameterSettingsControl.ascx.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Parameter\Mobiscroll\MobiscrollParameterControl.ascx.resx">
-      <DependentUpon>MobiscrollParameterControl.ascx.cs</DependentUpon>
+    <EmbeddedResource Include="Report\GoogleSheetsTemplate\GoogleSheetsTemplateReportControl.ascx.resx">
+      <DependentUpon>GoogleSheetsTemplateReportControl.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Compile Include="Settings\GoogleSheetsTemplateReportSettingsControl.ascx.designer.cs">
+      <DependentUpon>GoogleSheetsTemplateReportSettingsControl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\GoogleSheetsTemplateReportSettingsControl.ascx.cs">
+      <DependentUpon>GoogleSheetsTemplateReportSettingsControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Content Include="Report\GoogleSheetsTemplate\GoogleSheetsTemplateReportControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Settings\App_LocalResources\GoogleSheetsTemplateReportSettingsControl.ascx.resx" />
+    <Content Include="Settings\GoogleSheetsTemplateReportSettingsControl.ascx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DNNStuff.SQLViewPro.csproj">
@@ -157,7 +195,7 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Content Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -176,9 +214,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>1550</DevelopmentServerPort>
+          <DevelopmentServerPort>62053</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://dnn7.dnndev.me/DesktopModules/DNNStuff - SQLViewPro/Parameters/Mobile</IISUrl>
+          <IISUrl>http://dnn7.dnndev.me/DesktopModules/DNNStuff - SQLViewPro/Reports/GoogleSheets</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://dnn7.dnndev.me</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

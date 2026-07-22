@@ -64,3 +64,33 @@ particular report set. For instance, you can create a parameter that
 displays a drop down list of countries.
 
 See [Parameters](parameters)
+
+Web.config Application Settings
+--------------------------------
+
+Some features read configuration from the host site's `web.config` `<appSettings>`
+section rather than from the SQLView Pro UI, since they involve credentials or
+environment-specific values that shouldn't be stored in the module's own settings.
+
+The [Google Sheets Template](googlesheetstemplate) report type requires the
+following keys, used to retrieve the Google service-account key from Delinea
+Secret Server and to locate the shared Drive folders available for selection:
+
+```xml
+<appSettings>
+  <add key="DNNStuff:SQLViewPro:DelineaBaseUrl" value="https://your-secret-server/SecretServer" />
+  <add key="DNNStuff:SQLViewPro:DelineaUsername" value="your-service-account-username" />
+  <add key="DNNStuff:SQLViewPro:DelineaPassword" value="your-service-account-password" />
+  <add key="DNNStuff:SQLViewPro:DelineaGoogleSecretName" value="default-secret-name" />
+  <add key="DNNStuff:SQLViewPro:GoogleSheetsSharedDriveId" value="0AArrquXWv4AmUk9PVA" />
+</appSettings>
+```
+
+`DelineaGoogleSecretName` is the secret used by all Google Sheets Template
+reports.
+
+`GoogleSheetsSharedDriveId` is the id of the shared Drive that contains all
+the template folders. It is used to populate the "Drive Folder" dropdown
+shown on the report's settings panel - every non-trashed folder within this
+shared drive is listed by name for selection.
+
