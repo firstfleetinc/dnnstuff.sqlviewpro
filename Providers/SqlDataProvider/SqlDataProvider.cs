@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using DotNetNuke.Common.Utilities;
 using DotNetNuke.Framework.Providers;
 using Microsoft.ApplicationBlocks.Data;
-using System.Collections;
 
 namespace DNNStuff.SQLViewPro
 {
@@ -49,12 +48,7 @@ namespace DNNStuff.SQLViewPro
 
         #endregion
 
-        public SqlParameter CreateInputParameter(string name, object value)
-        {
-            return new SqlParameter(String.Concat("@", name), value);
-        }
-
-        public override DataSet RunQuery(string queryText, string dataSetName, Hashtable parameters)
+        public override DataSet RunQuery(string queryText, string dataSetName)
         {
             // make replacements for objectQualifier and databaseOwner
             queryText = Regex.Replace(queryText, "{oQ}|{objectQualifier}", ObjectQualifier, RegexOptions.IgnoreCase);
@@ -65,13 +59,6 @@ namespace DNNStuff.SQLViewPro
                 {
                     cmd.CommandTimeout = 0;
                     cmd.CommandType = CommandType.Text;
-                    if (parameters != null)
-                    {
-                        foreach (DictionaryEntry item in parameters)
-                        {
-                            cmd.Parameters.Add(CreateInputParameter(item.Key.ToString(), item.Value));
-                        }
-                    }
 
                     var adapter = new SqlDataAdapter(cmd);
                     cn.Open();

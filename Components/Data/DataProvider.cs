@@ -1,6 +1,5 @@
 using System.Data;
 using DotNetNuke.Framework;
-using System.Collections;
 
 namespace DNNStuff.SQLViewPro
 {
@@ -34,7 +33,7 @@ namespace DNNStuff.SQLViewPro
 #endregion
 		
 		// all core methods defined below
-		public abstract DataSet RunQuery(string queryText, string dataSetName, Hashtable parameters);
+		public abstract DataSet RunQuery(string queryText, string dataSetName);
 		
 		// report set
 		public abstract IDataReader GetReportSet(int reportSetId);

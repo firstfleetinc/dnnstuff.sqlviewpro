@@ -5,7 +5,6 @@ using System.Data;
 
 
 using DotNetNuke.Common.Utilities;
-using System.Collections;
 
 namespace DNNStuff.SQLViewPro.Services.Data
 {
@@ -13,12 +12,12 @@ namespace DNNStuff.SQLViewPro.Services.Data
     public class Query
     {
 
-        public static DataSet RetrieveData(string queryText, string connectionString, int cacheTimeout, string cacheScheme, Hashtable parameters)
+        public static DataSet RetrieveData(string queryText, string connectionString, int cacheTimeout, string cacheScheme)
         {
-            return RetrieveData(queryText, connectionString, "SQLData", "Table", cacheTimeout, cacheScheme, parameters);
+            return RetrieveData(queryText, connectionString, "SQLData", "Table", cacheTimeout, cacheScheme);
         }
 
-        public static DataSet RetrieveData(string queryText, string connectionString, string dataSetName, string srcTable, int cacheTimeout, string cacheScheme, Hashtable parameters)
+        public static DataSet RetrieveData(string queryText, string connectionString, string dataSetName, string srcTable, int cacheTimeout, string cacheScheme)
         {
             var results = default(DataSet);
 
@@ -42,7 +41,7 @@ namespace DNNStuff.SQLViewPro.Services.Data
             // not cached, grab live data
             if (string.IsNullOrEmpty(connectionString))
             {
-                results = DataProvider.Instance().RunQuery(queryText, dataSetName, parameters);
+                results = DataProvider.Instance().RunQuery(queryText, dataSetName);
             }
             else
             {
@@ -95,7 +94,7 @@ namespace DNNStuff.SQLViewPro.Services.Data
             // check for valid query
             try
             {
-                RetrieveData(Compatibility.ReplaceGenericTokensForTest(queryText), connectionString, 0, "Sliding", null);
+                RetrieveData(Compatibility.ReplaceGenericTokensForTest(queryText), connectionString, 0, "Sliding");
             }
             catch (Exception ex)
             {
