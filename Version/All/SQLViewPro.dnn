@@ -269,6 +269,10 @@
               <name>04.03.01.SqlDataProvider</name>
               <version>04.03.01</version>
             </script>
+            <script type="Install">
+              <name>04.03.02.SqlDataProvider</name>
+              <version>04.03.02</version>
+            </script>
             <script type="UnInstall">
               <name>Uninstall.SqlDataProvider</name>
             </script>
