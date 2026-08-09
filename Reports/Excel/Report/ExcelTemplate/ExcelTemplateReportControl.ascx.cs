@@ -154,7 +154,7 @@ using FlexCel.XlsAdapter;
 				xls.Save(ms);
 				
 				var details = new ExportDetails();
-				details.Data = null;
+				details.Dataset = null;
 				details.Filename = ReportExtra.OutputFileName.Replace("[TICKS]", DateTime.Now.Ticks.ToString()) + "." + fileExtension;
 				details.Disposition = ReportExtra.DispositionType;
 				

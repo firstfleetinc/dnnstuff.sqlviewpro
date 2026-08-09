@@ -43,9 +43,9 @@ namespace DNNStuff.SQLViewPro
                 var details = (ExportDetails) (Session[EXPORT_KEY]);
                 if (details != null)
                 {
-                    if (details.Data != null)
+                    if (details.Dataset != null)
                     {
-                        var ms = DataTableToExcel(details.Data.Tables[0]);
+                        var ms = DataTableToExcel(details.Dataset.Tables[0]);
                         ExportToExcel(ms, details);
                     }
                     else if (details.Binary != null)
@@ -170,7 +170,7 @@ namespace DNNStuff.SQLViewPro
         public string ContentType { get; set; }
 
         public string Disposition { get; set; } = "inline";
-        public DataSet Data { get; set; } = null;
+        public DataSet Dataset { get; set; } = null;
         public byte[] Binary { get; set; } = null;
         public string BinaryFilename { get; set; } = "";
     }

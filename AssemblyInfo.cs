@@ -15,7 +15,7 @@
 [assembly: System.Reflection.AssemblyCopyright("Copyright (c) DNNStuff 2017")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 [assembly: System.CLSCompliant(true)]
-[assembly: System.Reflection.AssemblyVersion("01.01.01")]
-[assembly: System.Reflection.AssemblyFileVersion("01.01.01")]
+[assembly: System.Reflection.AssemblyVersion("04.03.02")]
+[assembly: System.Reflection.AssemblyFileVersion("04.03.02")]
 
 

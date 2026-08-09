@@ -17,7 +17,6 @@ namespace DNNStuff.SQLViewPro.Controls
         public ReportInfo Report { get; set; }
         public StringBuilder DebugInfo { get; set; } = new StringBuilder();
 
-        public Hashtable ReportParameters {get;set;}
         public Hashtable ReportTokens { get; set; }
         public Hashtable ReportParameterTokens { get; set; }
 
@@ -44,8 +43,7 @@ namespace DNNStuff.SQLViewPro.Controls
 		/// <remarks></remarks>
 		public DataSet ReportData(string query)
 		{
-            GenerateReportParameters();
-			return Services.Data.Query.RetrieveData(query, Report.ReportConnectionString, Report.ReportCommandCacheTimeout, Report.ReportCommandCacheScheme, ReportParameters);
+			return Services.Data.Query.RetrieveData(query, Report.ReportConnectionString, Report.ReportCommandCacheTimeout, Report.ReportCommandCacheScheme);
 		}
 		
 		/// <summary>
@@ -189,7 +187,6 @@ namespace DNNStuff.SQLViewPro.Controls
 
         private void GenerateReportParameters()
         {
-            ReportParameters = new Hashtable();
             ReportParameterTokens = new Hashtable(); // holds tokens for report parameters, only used in headers etc. not used in sql query
 
             // do parameters
@@ -207,14 +204,12 @@ namespace DNNStuff.SQLViewPro.Controls
                             tokenValue = (string)(param.Values[0].Replace("\'", "\'\'"));
                         }
                     }
-                    ReportParameters.SafeHashtableAdd( "PARAMETER_" + param.ParameterIdentifier.ToLower(), tokenValue);
                     ReportParameterTokens.SafeHashtableAdd("PARAMETER:" + param.ParameterIdentifier.ToUpper(), tokenValue);
 
                 if (param.ExtraValues != null)
                     {
                         foreach (string key in param.ExtraValues.Keys)
                         {
-                            ReportParameters.SafeHashtableAdd( "PARAMETER_" + param.ParameterIdentifier.ToLower() + "_" + key.ToLower(), param.ExtraValues[key]);
                             ReportParameterTokens.SafeHashtableAdd("PARAMETER:" + param.ParameterIdentifier.ToUpper() + ":" + key.ToLower(), param.ExtraValues[key]);
                         }
                     }
@@ -228,9 +223,6 @@ namespace DNNStuff.SQLViewPro.Controls
                     keyval = qs[key];
                     if (key != null && keyval != null)
                     {
-                        ReportParameters.SafeHashtableAdd( "qs_" + key.ToLower(), keyval.ToString().Replace("\'", "\'\'"));
-                        ReportParameters.SafeHashtableAdd( "querystring_" + key.ToLower(), keyval.ToString().Replace("\'", "\'\'"));
-
                         ReportParameterTokens.SafeHashtableAdd("QS:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
                         ReportParameterTokens.SafeHashtableAdd("QUERYSTRING:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
                     }
@@ -243,9 +235,6 @@ namespace DNNStuff.SQLViewPro.Controls
                     keyval = fv[key];
                     if (key != null && keyval != null)
                     {
-                        ReportParameters.SafeHashtableAdd( "fv_" + key.ToLower(), keyval.ToString().Replace("\'", "\'\'"));
-                        ReportParameters.SafeHashtableAdd( "formval_" + key.ToLower(), keyval.ToString().Replace("\'", "\'\'"));
-
                         ReportParameterTokens.SafeHashtableAdd("FV:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
                         ReportParameterTokens.SafeHashtableAdd("FORMVAL:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
                     }
@@ -260,16 +249,28 @@ namespace DNNStuff.SQLViewPro.Controls
 
 		    var fullScreenParameters = "";
 
-            // do parameters - we are replacing our parameters with the @value that will be used in a sql or oledb parameter name
+            // do parameters - substitute actual parameter values directly into the query text
             foreach (ParameterInfo param in State.Parameters)
             {
-                ReportTokens.SafeHashtableAdd("PARAMETER:" + param.ParameterIdentifier.ToUpper(), "@" + "parameter_" + param.ParameterIdentifier.ToLower());
+                var tokenValue = "";
+                if (param.Values != null)
+                {
+                    if (param.MultiValued)
+                    {
+                        tokenValue = string.Join(",", param.Values.ToArray());
+                    }
+                    else
+                    {
+                        tokenValue = (string)(param.Values[0].Replace("\'", "\'\'"));
+                    }
+                }
+                ReportTokens.SafeHashtableAdd("PARAMETER:" + param.ParameterIdentifier.ToUpper(), tokenValue);
 
                 if (param.ExtraValues != null)
                 {
                     foreach (string key in param.ExtraValues.Keys)
                     {
-                        ReportTokens.SafeHashtableAdd("PARAMETER:" + param.ParameterIdentifier.ToUpper() + ":" + key.ToUpper(), "@" + "parameter_" + param.ParameterIdentifier.ToLower() + "_" + key.ToLower());
+                        ReportTokens.SafeHashtableAdd("PARAMETER:" + param.ParameterIdentifier.ToUpper() + ":" + key.ToUpper(), param.ExtraValues[key]);
                     }
                 }
             }
@@ -282,8 +283,8 @@ namespace DNNStuff.SQLViewPro.Controls
                 keyval = qs[key];
                 if (key != null && keyval != null)
                 {
-                    ReportTokens.SafeHashtableAdd("QS_" + key.ToLower(), "qs_" + key.ToLower());
-                    ReportTokens.SafeHashtableAdd("QUERYSTRING" + key.ToLower(), "querystring_" + key.ToLower());
+                    ReportTokens.SafeHashtableAdd("QS:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
+                    ReportTokens.SafeHashtableAdd("QUERYSTRING:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
                 }
             }
 
@@ -294,13 +295,13 @@ namespace DNNStuff.SQLViewPro.Controls
                 keyval = fv[key];
                 if (key != null && keyval != null)
                 {
-                    ReportTokens.SafeHashtableAdd("FV_" + key.ToLower(), "fv_" + key.ToLower());
-                    ReportTokens.SafeHashtableAdd("FORMVAL" + key.ToLower(), "formval_" + key.ToLower());
+                    ReportTokens.SafeHashtableAdd("FV:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
+                    ReportTokens.SafeHashtableAdd("FORMVAL:" + key.ToUpper(), keyval.ToString().Replace("\'", "\'\'"));
                 }
             }
 
             // fullscreen url
-            foreach (DictionaryEntry param in ReportParameters)
+            foreach (DictionaryEntry param in ReportTokens)
             {
                 fullScreenParameters = fullScreenParameters + string.Format("&{0}={1}", param.Key.ToString(), param.Value.ToString());
             }
