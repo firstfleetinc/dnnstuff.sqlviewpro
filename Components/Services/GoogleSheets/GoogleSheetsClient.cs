@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
@@ -27,6 +28,21 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 	{
 		private static readonly TimeSpan CredentialLifetime = TimeSpan.FromHours(1);
 		private static readonly string[] Scopes = { DriveService.Scope.Drive, SheetsService.Scope.Spreadsheets };
+
+		/// <summary>Max columns to scan rightward from a pivot table's anchor cell when detecting its header width.</summary>
+		private const int PivotMaxColumnScan = 50;
+
+		/// <summary>Max rows to scan downward from a pivot table's anchor cell when detecting its extent, bounding pathologically large sheets.</summary>
+		private const int PivotMaxRowScan = 50000;
+
+		/// <summary>Consecutive fully-blank rows required before treating a pivot's rendered output as finished, so a single stray blank separator row doesn't end the scan early.</summary>
+		private const int PivotBlankRowConfirmation = 2;
+
+		/// <summary>Max collapse requests per batchUpdate call, so workbooks with many pivot tables can't produce an oversized single payload.</summary>
+		private const int PivotBatchChunkSize = 100;
+
+		/// <summary>Matches a pivot subtotal row's rendered label, e.g. "Driver: John Smith Total".</summary>
+		private static readonly Regex TotalRowPattern = new Regex(@"\bTotal$", RegexOptions.IgnoreCase);
 
 		private static readonly object CredentialLock = new object();
 		private static DriveService _cachedDriveService;
@@ -233,6 +249,292 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 			{
 				throw GoogleSheetsClientException.FromGoogleApiException(GoogleSheetsErrorType.Export, string.Format("Error exporting spreadsheet '{0}' as xlsx.", spreadsheetId), ex);
 			}
+		}
+
+		/// <summary>
+		/// Collapse every pivot table's outer-most row-field group by writing
+		/// <c>Collapsed = true</c> into that group's <c>ValueMetadata</c>, one entry per unique
+		/// group value, so the pivot renders with only header/Total rows visible.
+		///
+		/// This reads each pivot table's rendered cell text to discover the actual group values
+		/// currently present (since a freshly written pivot has no pre-existing
+		/// <c>ValueMetadata</c>), merges <c>Collapsed = true</c> into the outer-most
+		/// <see cref="PivotGroup"/>'s <c>ValueMetadata</c> for each discovered value (preserving
+		/// any existing entries for values not currently rendered), and writes the entire
+		/// <c>PivotTable</c> object back via <c>UpdateCells</c> (the Sheets API requires the
+		/// whole pivot table definition on write, not a partial patch). Spreadsheets with no
+		/// pivot tables, or pivot tables with no row fields, are a no-op.
+		/// </summary>
+		public void CollapsePivotTables(string spreadsheetId)
+		{
+			try
+			{
+				var getRequest = Sheets.Spreadsheets.Get(spreadsheetId);
+				getRequest.Fields = "sheets(properties.sheetId,properties.gridProperties.rowCount,data(startRow,startColumn,rowData(values(formattedValue,pivotTable))))";
+				var spreadsheet = getRequest.Execute();
+
+				var collapseRequests = new List<Request>();
+
+				foreach (var sheet in spreadsheet.Sheets ?? new List<Sheet>())
+				{
+					var sheetId = sheet.Properties != null ? sheet.Properties.SheetId : null;
+					if (sheetId == null)
+					{
+						continue;
+					}
+
+					var maxRow = Math.Min(
+						sheet.Properties.GridProperties != null && sheet.Properties.GridProperties.RowCount.HasValue ? sheet.Properties.GridProperties.RowCount.Value : 0,
+						PivotMaxRowScan);
+					var dataChunks = sheet.Data ?? new List<GridData>();
+					var cellText = BuildCellTextLookup(dataChunks);
+
+					foreach (var dataChunk in dataChunks)
+					{
+						var startRow = dataChunk.StartRow ?? 0;
+						var startColumn = dataChunk.StartColumn ?? 0;
+						var rowDataList = dataChunk.RowData ?? new List<RowData>();
+
+						for (var rowIndex = 0; rowIndex < rowDataList.Count; rowIndex++)
+						{
+							var values = rowDataList[rowIndex].Values ?? new List<CellData>();
+							for (var colIndex = 0; colIndex < values.Count; colIndex++)
+							{
+								var pivotTable = values[colIndex].PivotTable;
+								var outerRowField = pivotTable != null && pivotTable.Rows != null && pivotTable.Rows.Count > 0 ? pivotTable.Rows[0] : null;
+								if (pivotTable == null || outerRowField == null)
+								{
+									continue;
+								}
+
+								var anchorRow = startRow + rowIndex;
+								var anchorColumn = startColumn + colIndex;
+
+								var width = DetectPivotWidth(cellText, anchorRow, anchorColumn, pivotTable);
+								var extentEnd = DetectPivotExtent(cellText, anchorRow, anchorColumn, width, maxRow);
+
+								if (extentEnd <= anchorRow)
+								{
+									continue;
+								}
+
+								// Only the outer-most row field needs to be collapsed:
+								// collapsing its groups collapses everything nested beneath.
+								var groupValues = DetectOuterGroupValues(
+									cellText,
+									anchorColumn,
+									anchorRow + 1,
+									extentEnd,
+									outerRowField.ShowTotals != false);
+
+								if (groupValues.Count == 0)
+								{
+									continue;
+								}
+
+								var updatedRows = new List<PivotGroup>(pivotTable.Rows);
+								updatedRows[0] = new PivotGroup
+								{
+									GroupRule = outerRowField.GroupRule,
+									Label = outerRowField.Label,
+									RepeatHeadings = outerRowField.RepeatHeadings,
+									ShowTotals = outerRowField.ShowTotals,
+									SortOrder = outerRowField.SortOrder,
+									SourceColumnOffset = outerRowField.SourceColumnOffset,
+									ValueBucket = outerRowField.ValueBucket,
+									ValueMetadata = MergeCollapsedValueMetadata(outerRowField.ValueMetadata, groupValues),
+								};
+
+								var updatedPivotTable = new PivotTable
+								{
+									Columns = pivotTable.Columns,
+									Criteria = pivotTable.Criteria,
+									Rows = updatedRows,
+									Source = pivotTable.Source,
+									ValueLayout = pivotTable.ValueLayout,
+									Values = pivotTable.Values,
+								};
+
+								collapseRequests.Add(new Request
+								{
+									UpdateCells = new UpdateCellsRequest
+									{
+										Start = new GridCoordinate { SheetId = sheetId, RowIndex = anchorRow, ColumnIndex = anchorColumn },
+										Rows = new List<RowData>
+										{
+											new RowData
+											{
+												Values = new List<CellData>
+												{
+													new CellData { PivotTable = updatedPivotTable },
+												},
+											},
+										},
+										Fields = "pivotTable",
+									},
+								});
+							}
+						}
+					}
+				}
+
+				if (collapseRequests.Count == 0)
+				{
+					return;
+				}
+
+				for (var i = 0; i < collapseRequests.Count; i += PivotBatchChunkSize)
+				{
+					var chunk = collapseRequests.Skip(i).Take(PivotBatchChunkSize).ToList();
+					var batchRequest = Sheets.Spreadsheets.BatchUpdate(new BatchUpdateSpreadsheetRequest { Requests = chunk }, spreadsheetId);
+					batchRequest.Execute();
+				}
+			}
+			catch (Google.GoogleApiException ex)
+			{
+				throw GoogleSheetsClientException.FromGoogleApiException(GoogleSheetsErrorType.Collapse, string.Format("Error collapsing pivot tables in spreadsheet '{0}'.", spreadsheetId), ex);
+			}
+		}
+
+		/// <summary>Build a fast (row, col) -> formattedValue lookup over one or more fetched GridData chunks.</summary>
+		private static Func<int, int, string> BuildCellTextLookup(IList<GridData> dataChunks)
+		{
+			var map = new Dictionary<string, string>();
+
+			foreach (var chunk in dataChunks)
+			{
+				var startRow = chunk.StartRow ?? 0;
+				var startColumn = chunk.StartColumn ?? 0;
+				var rowDataList = chunk.RowData ?? new List<RowData>();
+
+				for (var rowIndex = 0; rowIndex < rowDataList.Count; rowIndex++)
+				{
+					var values = rowDataList[rowIndex].Values ?? new List<CellData>();
+					for (var colIndex = 0; colIndex < values.Count; colIndex++)
+					{
+						if (!string.IsNullOrEmpty(values[colIndex].FormattedValue))
+						{
+							map[string.Format("{0}:{1}", startRow + rowIndex, startColumn + colIndex)] = values[colIndex].FormattedValue;
+						}
+					}
+				}
+			}
+
+			return (row, col) =>
+			{
+				string text;
+				return map.TryGetValue(string.Format("{0}:{1}", row, col), out text) ? text : string.Empty;
+			};
+		}
+
+		/// <summary>Count contiguous non-empty header columns starting at the pivot table's anchor cell, to bound scans.</summary>
+		private static int DetectPivotWidth(Func<int, int, string> cellText, int anchorRow, int anchorColumn, PivotTable pivotTable)
+		{
+			var structuralMinWidth = (pivotTable.Rows != null ? pivotTable.Rows.Count : 0) + (pivotTable.Values != null ? pivotTable.Values.Count : 0);
+
+			var width = 0;
+			while (width < PivotMaxColumnScan && cellText(anchorRow, anchorColumn + width) != string.Empty)
+			{
+				width++;
+			}
+
+			return Math.Max(width, Math.Max(structuralMinWidth, 1));
+		}
+
+		/// <summary>Finds the last row (inclusive) belonging to a rendered pivot table's output, scanning down from its anchor.</summary>
+		private static int DetectPivotExtent(Func<int, int, string> cellText, int anchorRow, int anchorColumn, int width, int maxRow)
+		{
+			var extentEnd = anchorRow;
+			var consecutiveBlankRows = 0;
+
+			for (var row = anchorRow + 1; row < maxRow; row++)
+			{
+				var rowHasContent = false;
+				for (var col = anchorColumn; col < anchorColumn + width; col++)
+				{
+					if (cellText(row, col) != string.Empty)
+					{
+						rowHasContent = true;
+						break;
+					}
+				}
+
+				if (!rowHasContent)
+				{
+					consecutiveBlankRows++;
+					if (consecutiveBlankRows >= PivotBlankRowConfirmation)
+					{
+						break;
+					}
+					continue;
+				}
+
+				consecutiveBlankRows = 0;
+				extentEnd = row;
+			}
+
+			return extentEnd;
+		}
+
+		/// <summary>
+		/// Scans the outer-most pivot row-field column and returns the distinct group values
+		/// rendered there. When <paramref name="excludeTotals"/> is true (the field has
+		/// ShowTotals enabled), rows matching <see cref="TotalRowPattern"/> are treated as
+		/// generated subtotal rows and skipped; otherwise every non-blank value is kept, even
+		/// if it happens to end in "Total".
+		/// </summary>
+		private static List<string> DetectOuterGroupValues(Func<int, int, string> cellText, int column, int rangeStart, int rangeEnd, bool excludeTotals)
+		{
+			var values = new List<string>();
+
+			for (var row = rangeStart; row <= rangeEnd; row++)
+			{
+				var text = cellText(row, column);
+				if (text == string.Empty || (excludeTotals && TotalRowPattern.IsMatch(text.Trim())))
+				{
+					continue;
+				}
+
+				values.Add(text);
+			}
+
+			return values;
+		}
+
+		/// <summary>
+		/// Merges <c>Collapsed = true</c> into a row field's existing <c>ValueMetadata</c> for
+		/// each newly-discovered group value, keyed by <c>Value.StringValue</c>. Existing
+		/// entries for values not currently rendered (e.g. filtered out) are preserved rather
+		/// than discarded.
+		/// </summary>
+		private static List<PivotGroupValueMetadata> MergeCollapsedValueMetadata(IList<PivotGroupValueMetadata> existing, List<string> groupValues)
+		{
+			var merged = new Dictionary<string, PivotGroupValueMetadata>();
+			var order = new List<string>();
+
+			foreach (var entry in existing ?? new List<PivotGroupValueMetadata>())
+			{
+				var key = entry.Value != null ? entry.Value.StringValue : null;
+				if (key != null)
+				{
+					if (!merged.ContainsKey(key))
+					{
+						order.Add(key);
+					}
+					merged[key] = entry;
+				}
+			}
+
+			foreach (var value in groupValues)
+			{
+				if (!merged.ContainsKey(value))
+				{
+					order.Add(value);
+				}
+				merged[value] = new PivotGroupValueMetadata { Value = new ExtendedValue { StringValue = value }, Collapsed = true };
+			}
+
+			return order.Select(key => merged[key]).ToList();
 		}
 
 		/// <summary>

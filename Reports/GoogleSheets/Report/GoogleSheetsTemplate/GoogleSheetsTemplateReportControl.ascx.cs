@@ -109,6 +109,18 @@ namespace DNNStuff.SQLViewPro.GoogleSheetsReports
 					client.WriteData(spreadsheetId, string.Format("{0}!A1", dataSheetName), BuildValueRows(dt, includeHeader: true));
 				}
 
+				try
+				{
+					client.CollapsePivotTables(spreadsheetId);
+				}
+				catch (Exception ex)
+				{
+					// Best-effort: a failure here shouldn't block the report from being
+					// generated - it just means the pivot table(s) will be fully expanded
+					// instead of collapsed in this export.
+					DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
+				}
+
 				var xlsxBytes = client.ExportAsXlsx(spreadsheetId);
 
 				var details = new ExportDetails();
