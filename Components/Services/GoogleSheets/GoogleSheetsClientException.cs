@@ -11,6 +11,7 @@ namespace DNNStuff.SQLViewPro.Services.GoogleSheets
 		Export,
 		Delete,
 		FolderList,
+		Collapse,
 		RateLimit,
 		Unknown
 	}
